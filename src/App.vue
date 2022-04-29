@@ -1,18 +1,60 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <div class="todo-container">
+    <div class="todo-wrap">
+      <!-- addItem添加一条数据，在Header组件中，触发App组件中的addItem方法 -->
+      <Header :addItem="addItem"></Header>
+      <List :todos="todos"></List>
+      <Footer></Footer>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import HelloWorld from "./components/HelloWorld.vue";
+import { defineComponent, reactive, toRefs } from 'vue';
+import Header from './components/Header.vue';
+import List from './components/List.vue';
+import Footer from './components/Footer.vue';
+// 引入接口
+import { Itodo } from './types/Itodo';
 
-@Options({
-  components: {
-    HelloWorld,
+/**
+ *
+ * @ 分析
+ * 1.Header List Footer和Item组件之间的关系很清楚，从App到Item最多孙子级组件，可以直接将数据定义在App组件中，供给子孙组件使用
+ * 2.自定义一些数据，将数据渲染到列表中
+ * 3.数据结构使用对象数据，对象是每个条目的信息：包含id,title,是否选中isCompleted
+ *
+ */
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    // 定义数据
+    // 数据不允许添加其他属性，使用泛型约束
+    const state = reactive<{ todos: Itodo[] }>({
+      todos: [
+        { id: 1, title: '宝马', isCompleted: true },
+        { id: 2, title: '奥迪', isCompleted: false },
+        { id: 3, title: '劳斯莱斯', isCompleted: true }
+      ]
+    });
+    // 在数组的最前面添加有一个todo对象
+    const addItem = (todo: Itodo) => {
+      // reactive对象，直接对象.键名读取键值，这里键值是数组
+      state.todos.unshift(todo);
+    };
+    return {
+      // 模板中可以直接使用todos数组了
+      ...toRefs(state),
+      addItem
+    };
   },
-})
-export default class App extends Vue {}
+  components: {
+    Header,
+    List,
+    Footer
+  }
+});
 </script>
 
 <style lang="less">
@@ -23,5 +65,15 @@ export default class App extends Vue {}
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+/*app*/
+.todo-container {
+  width: 600px;
+  margin: 0 auto;
+  .todo-wrap {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
 }
 </style>
