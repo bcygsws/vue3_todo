@@ -3,7 +3,7 @@
     <div class="todo-wrap">
       <!-- addItem添加一条数据，在Header组件中，触发App组件中的addItem方法 -->
       <Header :addItem="addItem"></Header>
-      <List :todos="todos"></List>
+      <List :todos="todos" :deleteData="deleteData"></List>
       <Footer></Footer>
     </div>
   </div>
@@ -43,10 +43,21 @@ export default defineComponent({
       // reactive对象，直接对象.键名读取键值，这里键值是数组
       state.todos.unshift(todo);
     };
+    // 从数组中删除某一项，传入该项的索引，splice方法，从数组中删除元素
+    const deleteData = (id: number) => {
+      // 根据传入的id,找该条数据对象，在数组中的索引值，some方法
+      state.todos.some((item, index) => {
+        if (item.id === id) {
+          state.todos.splice(index, 1);
+          return true;
+        }
+      });
+    };
     return {
       // 模板中可以直接使用todos数组了
       ...toRefs(state),
-      addItem
+      addItem,
+      deleteData
     };
   },
   components: {

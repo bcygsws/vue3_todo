@@ -9,7 +9,13 @@
       <input type="checkbox" :checked="todo.isCompleted" />
       <span>{{ todo.title }}</span>
     </label>
-    <button class="btn btn-danger" :style="{ display: isShow }">删除</button>
+    <button
+      class="btn btn-danger"
+      :style="{ display: isShow }"
+      @click="deleteOne(todo.id)"
+    >
+      删除
+    </button>
   </li>
 </template>
 
@@ -21,9 +27,13 @@ import { defineComponent, ref } from 'vue';
 export default defineComponent({
   name: 'Item',
   props: {
-    todo: Object as () => Itodo // 函数的返回类型是Itodo，将Object对象断言为了Itodo
+    todo: Object as () => Itodo, // 函数的返回类型是Itodo，将Object对象断言为了Itodo
+    deleteData: {
+      type: Function,
+      required: true
+    }
   },
-  setup() {
+  setup(props) {
     const bgColor = ref('white');
     const myColor = ref('black');
     const isShow = ref('none');
@@ -41,11 +51,22 @@ export default defineComponent({
         isShow.value = 'none';
       }
     };
+    // 删除按钮的事件处理函数,id也可以从setup的参数props中拿到
+    console.log(props);
+    const deleteOne = (id: number) => {
+      // 通过id在数组中寻找，该id所在对象 在数组中的索引位置
+      // 可以使用对话框判断
+      // confirm是确定/取消对话框，点击确定按钮后，值为true；点击取消值为false
+      if (window.confirm('确定删除吗？')) {
+        props.deleteData(id);
+      }
+    };
     return {
       handleMouse,
       bgColor,
       myColor,
-      isShow
+      isShow,
+      deleteOne
     };
   }
 });
