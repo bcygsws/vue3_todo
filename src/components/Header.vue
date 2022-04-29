@@ -11,8 +11,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-// 引入数据类型接口
-import { Itodo } from '../types/Itodo';
 export default defineComponent({
   name: 'Header',
   props: {
@@ -35,8 +33,10 @@ export default defineComponent({
         title: title.value,
         isCompleted: false
       };
-      // console.log(todo);
+      console.log(todo);
       props.addItem(todo);
+      // 数据添加完成，清空文本框
+      title.value = '';
     };
 
     return { add, title };
