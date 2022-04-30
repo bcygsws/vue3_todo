@@ -1,6 +1,6 @@
 <template>
   <ul class="todo-main">
-    <Item :todo="item" v-for="item in todos" :key="item.id" :deleteData="deleteData"></Item>
+    <Item :todo="item" v-for="item in todos" :key="item.id" :deleteData="deleteData" :toggleSelect="toggleSelect"></Item>
   </ul>
 </template>
 <script lang="ts">
@@ -13,7 +13,7 @@ export default defineComponent({
     Item
   },
   // 接收父组件传递过来的todos数据
-  props: ['todos','deleteData']
+  props: ['todos','deleteData',"toggleSelect"]
 });
 </script>
 <style scoped lang="less">

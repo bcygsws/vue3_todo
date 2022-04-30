@@ -6,7 +6,10 @@
     :style="{ backgroundColor: bgColor, color: myColor }"
   >
     <label>
-      <input type="checkbox" :checked="todo.isCompleted" />
+      <!-- 1.checked只是根据数组中的值true和false,渲染出复选框的选中或者未选中状态，并没有直接更改isCompleted的值
+      为此，我们需要使用计算和监听：当isCompleted的值，改变时，立即拿到最新的isCompleted值
+      2.checkbox也有v-model里面的值，是控制复选框的选中或未选中的 -->
+      <input type="checkbox" v-model="isSelected" />
       <span>{{ todo.title }}</span>
     </label>
     <button
@@ -22,13 +25,20 @@
 <script lang="ts">
 // 引入井口
 import { Itodo } from '../types/Itodo';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 // 引入接口
 export default defineComponent({
   name: 'Item',
   props: {
-    todo: Object as () => Itodo, // 函数的返回类型是Itodo，将Object对象断言为了Itodo
+    todo: {
+      type: Object as () => Itodo,
+      required: true
+    }, // 函数的返回类型是Itodo，将Object对象断言为了Itodo
     deleteData: {
+      type: Function,
+      required: true
+    },
+    toggleSelect: {
       type: Function,
       required: true
     }
@@ -61,12 +71,25 @@ export default defineComponent({
         props.deleteData(id);
       }
     };
+    console.log(props.todo);
+    const isSelected = computed({
+      get() {
+        return props.todo.isCompleted;
+      },
+      set(val: boolean) {
+        // todo是从App组件中的todos数组，传递给孙子组件Item中，Item本身是没有权限更改这个数据的，需要调用App中定义的方法来
+        // 改变这个值
+        // props.todo.isCompleted = val; // Error
+        props.toggleSelect(props.todo, val);
+      }
+    });
     return {
       handleMouse,
       bgColor,
       myColor,
       isShow,
-      deleteOne
+      deleteOne,
+      isSelected
     };
   }
 });

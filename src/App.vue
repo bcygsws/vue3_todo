@@ -3,7 +3,11 @@
     <div class="todo-wrap">
       <!-- addItem添加一条数据，在Header组件中，触发App组件中的addItem方法 -->
       <Header :addItem="addItem"></Header>
-      <List :todos="todos" :deleteData="deleteData"></List>
+      <List
+        :todos="todos"
+        :deleteData="deleteData"
+        :toggleSelect="toggleSelect"
+      ></List>
       <Footer></Footer>
     </div>
   </div>
@@ -38,12 +42,12 @@ export default defineComponent({
         { id: 3, title: '劳斯莱斯', isCompleted: true }
       ]
     });
-    // 在数组的最前面添加有一个todo对象
+    // 操作一；在数组的最前面添加有一个todo对象
     const addItem = (todo: Itodo) => {
       // reactive对象，直接对象.键名读取键值，这里键值是数组
       state.todos.unshift(todo);
     };
-    // 从数组中删除某一项，传入该项的索引，splice方法，从数组中删除元素
+    // 操作二、从数组中删除某一项，传入该项的索引，splice方法，从数组中删除元素
     const deleteData = (id: number) => {
       // 根据传入的id,找该条数据对象，在数组中的索引值，some方法
       state.todos.some((item, index) => {
@@ -53,11 +57,22 @@ export default defineComponent({
         }
       });
     };
+    // 操作三、切换选中状态
+    const toggleSelect = (todo: Itodo, isSelected: boolean) => {
+      state.todos.some((item, index) => {
+        if (todo.id === item.id) {
+          state.todos[index].isCompleted = isSelected;
+          console.log(state.todos);
+          return true;
+        }
+      });
+    };
     return {
       // 模板中可以直接使用todos数组了
       ...toRefs(state),
       addItem,
-      deleteData
+      deleteData,
+      toggleSelect
     };
   },
   components: {
