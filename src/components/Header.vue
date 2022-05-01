@@ -34,6 +34,7 @@ export default defineComponent({
         isCompleted: false
       };
       console.log(todo);
+      // vue的单向数据流：父组件向子组件传值，子组件本身不能修改它，需要借助emit父组件的方法来修改，然后这种变化从父组件流向子组件
       props.addItem(todo);
       // 数据添加完成，清空文本框
       title.value = '';
@@ -55,6 +56,7 @@ export default defineComponent({
   border-radius: 4px;
   padding: 4px 7px;
   &:focus {
+    /* 将文本框获取焦点时，默认的黑框轮廓去掉 */
     outline: none;
     border-color: rgba(82, 168, 236, 0.8);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),

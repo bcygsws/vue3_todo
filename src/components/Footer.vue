@@ -15,8 +15,6 @@
 
 <script lang="ts">
 import { defineComponent, toRefs, computed } from 'vue';
-// 引入接口
-import { Itodo } from '../types/Itodo';
 export default defineComponent({
   name: 'Footer',
   props: {
@@ -27,8 +25,12 @@ export default defineComponent({
       },
       required: true
     },
-    todos: {
-      type: Array as () => Itodo[],
+    // todos: {
+    //   type: Array as () => Itodo[],
+    //   required: true
+    // },
+    checkAll: {
+      type: Function,
       required: true
     },
     deleteItems: {
@@ -38,20 +40,26 @@ export default defineComponent({
   },
   setup(props) {
     const isAll = computed({
+      // get处理列表中的各条目影响Footer中复选框的选中或者取消
       get() {
-        return props.todos.every((item) => {
-          return item.isCompleted === true;
-        });
+        // 方法一
+        // return props.todos.every((item) => {
+        //   return item.isCompleted === true;
+        // });
+        // 方法二
+        return props.len.arrLength === props.len.selLength ? true : false;
       },
+      // set处理手动【选中】或者【取消】影响各条目的全选中或者全取消
       set(val: boolean) {
         // 要操作App中的数组todos,由于Footer和App是子组件和父组件的关系，可以直接将todos传递过来，使用props.todos拿到数组
-        props.todos.map((item) => {
-          // props.todos是父组件APP传递过来的，这里改变数组值，App中watch能监听到todos的变化
-          item.isCompleted = val;
-        });
+        // props.todos是父组件APP传递过来的，这里改变数组值，App中watch能监听到todos的变化
+        // props.todos.map((item) => {
+        //   item.isCompleted = val;
+        // });
+        props.checkAll(val);
       }
     });
-    // 将那些勾选的
+    // 按钮【清除已完成任务】的事件处理-click事件
     const clearSelect = () => {
       props.deleteItems();
     };

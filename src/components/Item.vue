@@ -67,6 +67,7 @@ export default defineComponent({
       // 通过id在数组中寻找，该id所在对象 在数组中的索引位置
       // 可以使用对话框判断
       // confirm是确定/取消对话框，点击确定按钮后，值为true；点击取消值为false
+      // 在项目中，可以使用第三方UI库中的对话框，例如：Element UI,中有对话框组件
       if (window.confirm('确定删除吗？')) {
         props.deleteData(id);
       }
