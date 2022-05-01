@@ -10,7 +10,11 @@
       ></List>
       <!-- Footer中的复选框控制全选或者全不选时，可以通过arrLength和selLength是否相等，来确定isAll计算属性的get方法返回值 -->
       <!-- <Footer :len="len" :todos="todos" :deleteItems="deleteItems" :checkAll="checkAll"></Footer> -->
-      <Footer :len="len"  :deleteItems="deleteItems" :checkAll="checkAll"></Footer>
+      <Footer
+        :len="len"
+        :deleteItems="deleteItems"
+        :checkAll="checkAll"
+      ></Footer>
     </div>
   </div>
 </template>
@@ -120,7 +124,7 @@ export default defineComponent({
     // 操作六、点击按钮【清除已完成任务】，删除那些被选中的条目
     const deleteItems = () => {
       // 过滤后，保留那些未被选中的条目
-    state.todos = state.todos.filter((item: Itodo) => {
+      state.todos = state.todos.filter((item: Itodo) => {
         return item.isCompleted === false;
       });
       // saveTodos(noSelected);
