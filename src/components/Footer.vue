@@ -46,6 +46,7 @@ export default defineComponent({
       set(val: boolean) {
         // 要操作App中的数组todos,由于Footer和App是子组件和父组件的关系，可以直接将todos传递过来，使用props.todos拿到数组
         props.todos.map((item) => {
+          // props.todos是父组件APP传递过来的，这里改变数组值，App中watch能监听到todos的变化
           item.isCompleted = val;
         });
       }
