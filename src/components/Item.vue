@@ -26,7 +26,7 @@
 // 引入井口
 import { Itodo } from '../types/Itodo';
 import { defineComponent, ref, computed } from 'vue';
-// 引入接口
+// 引入类型转换函数
 export default defineComponent({
   name: 'Item',
   props: {
@@ -73,8 +73,10 @@ export default defineComponent({
       }
     };
     console.log(props.todo);
+    // props.todo对象中isCompleted是数值型，将其转化为布尔类型
     const isSelected = computed({
       get() {
+        // 数值型直接转换成了布尔类型
         return props.todo.isCompleted;
       },
       set(val: boolean) {

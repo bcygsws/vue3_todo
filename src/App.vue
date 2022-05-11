@@ -28,8 +28,11 @@ import Footer from './components/Footer.vue';
 // 引入接口
 import { Itodo } from './types/Itodo';
 // 引入读、写本地缓存的方法
-import { saveTodos, getTodos } from './utils/storageUtils';
-
+// import { saveTodos, getTodos } from './utils/storageUtils';
+// 引入自定义钩子，requests.ts;操作数据库
+// import { getRequest } from './utils/requests';
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:3001/';
 /**
  *
  * @ 分析
@@ -54,13 +57,43 @@ export default defineComponent({
       todos: []
     });
     // setup在beforeCreated和created之前执行，在setup中写的代码，相当于在created阶段完成数据初始化
-    state.todos = getTodos();
+    // 一、采用本地缓存localStorage
+    // state.todos = getTodos();
+    // 二、使用数据库里的数据,自定义钩子
+    const getTodos = () => {
+      axios.get('todos').then((res) => {
+        // map和forEach的区别在于元素执行回调后，前者返回值是改变后的新数组，而forEach返回undefined
+        let arr1: Itodo[] = [];
+        if (res.status === 200) {
+          res.data.map((item: Itodo) => {
+            item.isCompleted = item.isCompleted ? true : false;
+            // 使用unshift保证增加记录时，数据按照id从大到小渲染
+            arr1.unshift(item);
+          });
+          state.todos = arr1;
+        }
+      });
+    };
+    getTodos();
+    console.log(state.todos);
+    // axios.get('http://localhost:3001/todos').then((res) => {
+    //   state.todos = res.data;
+    //   console.log(state.todos);
+    // });
+    // console.log(state.todos); // 空Proxy对象，原因是：请求后台数据是异步过程
     // 先检查本地的localStorage中有没有数据，无数据，使用state就可以；有数据把从本地读取的数据赋给state
     // 多处有改变数组的任何内容的地方，都需要更新本地缓存的数据，将保存和读取缓存的操作封装，自定义hook
     // 操作一；在数组的最前面添加有一个todo对象
     const addItem = (todo: Itodo) => {
       // reactive对象，直接对象.键名读取键值，这里键值是数组
       state.todos.unshift(todo);
+      axios.post('todos/todo', todo).then((res) => {
+        console.log(res);
+        if (res.data.code === 200) {
+          console.log(res.data.msg);
+          getTodos();
+        }
+      });
     };
     // 操作二、从数组中删除某一项，传入该项的索引，splice方法，从数组中删除元素
     const deleteData = (id: number) => {
@@ -71,14 +104,26 @@ export default defineComponent({
           return true;
         }
       });
+      // 从数据库中删除该id对应的记录
+      axios.delete(`todos/todo/${id}`).then((res) => {
+        if (res.data.code === 200) {
+          console.log(res);
+        }
+      });
     };
     // 操作三、切换选中状态
     const toggleSelect = (todo: Itodo, isSelected: boolean) => {
+      console.log(todo);
       state.todos.some((item, index) => {
         if (todo.id === item.id) {
           state.todos[index].isCompleted = isSelected;
           console.log(state.todos);
           return true;
+        }
+      });
+      axios.put(`todos/todo/${todo.id}/${isSelected ? 1 : 0}`).then((res) => {
+        if (res.data.code === 200) {
+          console.log('成功更改一条记录');
         }
       });
     };
@@ -120,6 +165,12 @@ export default defineComponent({
       state.todos.map((item) => {
         item.isCompleted = val;
       });
+      // 更改提交到数据库
+      axios.put(`todos/${val ? 1 : 0}`).then((res) => {
+        if (res.data.code === 200) {
+          console.log(val ? '所有复选框选中' : '所有复选框都取消');
+        }
+      });
     };
     // 操作六、点击按钮【清除已完成任务】，删除那些被选中的条目
     const deleteItems = () => {
@@ -127,16 +178,20 @@ export default defineComponent({
       state.todos = state.todos.filter((item: Itodo) => {
         return item.isCompleted === false;
       });
+      console.log(state.todos);
+      // data是固定写法，{data:state.todos},后端直接req.body获取state.todos这个数组
+      axios.delete('todos', { data: state.todos }).then((res) => {
+        if (res.data.code === 200) {
+          console.log('删除选中的记录成功');
+        }
+      });
       // saveTodos(noSelected);
       // state.todos = noSelected;
-      saveTodos(state.todos);
+      // saveTodos(state.todos);
     };
     // 操作七、数据持久化
     // 使用watch的两个特性，原因是:state.todos变化可能是深层次的数据，初始执行一次
-    watch(
-      state.todos,
-      (val) => {
-        // 测试数据监听是否成功
+    // 测试数据监听是否成功
         /**
          *
          * Bug分析
@@ -175,14 +230,17 @@ export default defineComponent({
          *
          *
          */
-        console.log('数据监听了---', val);
-        saveTodos(val);
-      },
-      {
-        immediate: true,
-        deep: true
-      }
-    );
+    // watch(
+    //   state.todos,
+    //   (val) => {
+    //     console.log('数据监听了---', val);
+    //     // saveTodos(val);
+    //   },
+    //   {
+    //     immediate: true,
+    //     deep: true
+    //   }
+    // );
     return {
       // 模板中可以直接使用todos数组了
       ...toRefs(state),

@@ -28,10 +28,11 @@ export default defineComponent({
       if (!title.value.trim()) return;
       // title有值，组织成一个对象，传给addItem方法
       const todo = {
-        // 调用父组件App的addItem方法
-        id: Date.now() + Math.random() * 100,
+        // 调用父组件App的addItem方法，数组库操作时，id自增，添加数据时，id可省
+        // id: Date.now() + Math.random() * 100,
         title: title.value,
-        isCompleted: false
+        // 0代表false
+        isCompleted: 0
       };
       console.log(todo);
       // vue的单向数据流：父组件向子组件传值，子组件本身不能修改它，需要借助emit父组件的方法来修改，然后这种变化从父组件流向子组件
