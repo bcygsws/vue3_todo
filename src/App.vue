@@ -180,6 +180,15 @@ export default defineComponent({
       });
       console.log(state.todos);
       // data是固定写法，{data:state.todos},后端直接req.body获取state.todos这个数组
+      /**
+       * 
+       * @ 区别
+       * axios的delete传参和post put传参方式不同
+       * a.post put请求方式，有三个参数，url,data,config
+       * b.然而，delete请求方式，只有两个参数，url,config，data在config中，data是config的一个属性
+       * axios.delete(url,{data:传递的参数})，第二个参数相当于将config解构
+       * 
+       */
       axios.delete('todos', { data: state.todos }).then((res) => {
         if (res.data.code === 200) {
           console.log('删除选中的记录成功');
